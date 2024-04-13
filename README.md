@@ -1,0 +1,1 @@
+# aihack_2024_mincult
