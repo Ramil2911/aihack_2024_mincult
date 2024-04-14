@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import io
 
@@ -31,6 +32,13 @@ model_capt, vis_processors_capt, txt_processors_capt = load_model_and_preprocess
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/search")
 async def search(image: UploadFile = File(...)):

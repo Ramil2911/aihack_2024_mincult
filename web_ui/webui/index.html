@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <link href="static/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="black-box">
+        <div class="load-box">
+            <script src="static/bootstrap/dist/js/bootstrap.min.js"></script>
+            <h3>Поиск по изображению</h3>
+            <form id="uploadForm">
+                <label class="slice"><input class="form-control" type="file" id="photoInput" accept="image/*" required></label>
+                <button class="btn btn-outline-dark" type="submit">Найти</button>
+            </form>
+        </div>
+        <div id="content" class="content-box">
+        </div>
+    </div>
+    <script>
+        async function getPathImage(key) {
+            try {
+                const response = await fetch(`${connectAPI}/get_image/${key}`);
+                const path = await response.text();
+                return path;
+
+            } catch (error) {
+                console.error('Error saving image:', error);
+            }
+        }
+        
+        const connectAPI = 'http://api:8001';
+        
+        const form = document.getElementById('uploadForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('photo', document.getElementById('photoInput').files[0]);
+
+            try {
+                const response = await fetch(`${connectAPI}/search`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                let content = document.getElementById('content');
+                
+                // Удаление всех элементов с классом 'image-box'
+                let remElements = document.getElementsByClassName('image-box');
+                while (remElements.length > 0) {
+                    remElements[0].remove();
+                }
+
+                data.forEach((item) => {
+                    
+                    let it_im = document.createElement('div');
+                    it_im.className = 'image-box';
+                    
+                    let im = document.createElement('img');
+                    im.className = 'img';
+                    const imagePath = getPathImage(item[0]);
+                    getPathImage(item[0]).then(imagePath => {
+                        const imagePathCleaned = imagePath.replace(/['"]+/g, '');
+                        im.src = 'train/' + imagePathCleaned;
+                    }).catch(error => {
+                        console.error('Error loading image:', error);
+                        // В случае ошибки можно установить изображение-заглушку или другое значение src
+                        im.src = '';
+                    });
+
+                    let name = document.createElement('p');
+                    name.style.marginTop = '6px';
+                    name.style.marginLeft = '4px';
+                    name.textContent = `Название: ${item[1]}`;
+
+                    let cl = document.createElement('p');
+                    cl.style.marginLeft = '4px';
+                    cl.textContent = `Категория: ${item[3]}`;
+
+                    let description = document.createElement('p');
+                    description.style.marginLeft = '4px';
+                    description.textContent = `Описание: ${item[2]}`;
+
+                    let clos = document.createElement('p');
+                    clos.style.marginLeft = '4px';
+                    var mathValue = (1 - item[4]) * 100;
+                    clos.textContent = `Соответствие: ${mathValue.toFixed(2)}%`;
+
+                    // Добавляем созданные элементы в контейнер it_im
+                    it_im.appendChild(im);
+                    it_im.appendChild(name);
+                    it_im.appendChild(cl);
+                    it_im.appendChild(description);
+                    it_im.appendChild(clos);
+
+                    // Добавляем контейнер it_im на страницу (в какой-то родительский элемент)
+                    content.appendChild(it_im); // Здесь вы можете указать другой элемент, куда хотите добавить контейнер it_im
+                });
+                const fileInput = document.getElementById('photoInput');
+                fileInput.value = '';
+            } catch (error) {
+                console.error('Error uploading photo:', error);
+                alert('Failed to upload photo');
+            }
+            
+        });
+
+    </script>
+</body>
+</html>
