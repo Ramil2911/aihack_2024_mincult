@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <link href="{{ url_for('static', path='/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/load/style.css') }}" rel="stylesheet">
+</head>
+<body>
+
+<div class="black-box">
+    <div class="load-box">
+        <script src="{{ url_for('static', path='/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+        <h3>Поиск по изображению</h3>
+        {% if data == None %}
+            <form action="/search/" method="post" enctype="multipart/form-data">
+                <label class="slice"><input class="form-control" type="file" name="file"></label>
+                <button class="btn btn-outline-dark" type="submit">Найти</button>
+            </form>
+        {% else %}
+            <a href="/reset/">Сбросить поиск</a>
+        {% endif %}
+    </div>
+    {% if data %}
+        <div class="content-box">
+            {% for item in data %}
+                {% if item[0] != None %}
+                    <div class="image-box">
+                        <img class="img" src="{{ url_for('train', path=item[0]) }}">
+                        <p style="margin-top: 6px; margin-left: 4px;">Название: {{ item[1] }}</p>
+                        <p style="margin-left: 4px;">Описание: {{ item[2] }}</p>
+                        <p style="margin-left: 4px;">Сходство: {{ ((1.0 - item[4]) * 100) | round(2) }}%</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

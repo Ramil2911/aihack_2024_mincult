@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+
+  api:
+    build: ./ai_api
+    ports:
+      - "8001:8001"
+    links:
+      - clickhouse
+
+  ui:
+    build: ./web_ui
+    ports:
+      - "8000:8000"
+    links:
+      - api
+
+
+#networks:
+#  hack:
+#    external: true

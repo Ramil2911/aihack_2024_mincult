@@ -1,0 +1,10 @@
+clickhouse_connect
+pillow
+salesforce-lavis
+transformers
+fastapi
+pydantic
+uvicorn
+requests
+jinja2
+python-multipart
